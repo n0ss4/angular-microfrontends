@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.mfe4-container {
+  padding: 20px;
+  background-color: #f0f4ff;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  margin: 10px 0;
+
+  h1 {
+    color: #4a90e2;
+    margin: 0 0 16px 0;
+  }
+
+  h2 {
+    color: #333;
+    margin: 16px 0 8px 0;
+  }
+
+  p {
+    margin: 8px 0;
+    line-height: 1.6;
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-left: 20px;
+
+    li {
+      margin: 4px 0;
+    }
+  }
+}
+
+.mfe4-content {
+  margin-top: 16px;
+}

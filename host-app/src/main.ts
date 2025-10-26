@@ -20,6 +20,11 @@ initFederation('/assets/federation.manifest.json')
             entry: 'http://localhost:4202/remoteEntry.js',
             type: 'esm',
           },
+          {
+            name: 'mfe4-app',
+            entry: 'http://localhost:4204/remoteEntry.js',
+            type: 'esm',
+          },
       ],
       shared,
     }).initializeSharing();
