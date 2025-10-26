@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+// Importar auth para que esté disponible vía Federation
+import './core/auth';
 
 @Component({
   selector: 'host-root',
