@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { switchMap, delay } from 'rxjs/operators';
 import {
   OidcTokenResponse,
   OidcDiscoveryDoc,
@@ -7,14 +8,6 @@ import {
   UserClaims
 } from '../models';
 
-/**
- * Mock OIDC Provider Service
- *
- * Simula un Identity Provider (IdP) completo tipo Auth0, Keycloak, o Azure AD
- *
- * En producción, esto sería reemplazado por llamadas HTTP reales a un IdP.
- * Este mock es útil para desarrollo y testing.
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -22,8 +15,6 @@ export class MockOidcProviderService {
 
   private readonly ISSUER = 'http://localhost:4200/mock-idp';
   private readonly CLIENT_ID = 'angular-microfrontends-client';
-
-  // Base de datos simulada de usuarios
   private mockUsers: Array<{ username: string; password: string; userData: User }> = [
     {
       username: 'admin@example.com',
@@ -72,7 +63,6 @@ export class MockOidcProviderService {
     }
   ];
 
-  // Almacenamiento temporal de códigos de autorización
   private authorizationCodes = new Map<string, {
     user: User;
     scope: string;
@@ -80,16 +70,10 @@ export class MockOidcProviderService {
     nonce?: string;
   }>();
 
-  // Almacenamiento temporal de refresh tokens
   private refreshTokens = new Map<string, {
     user: User;
     expiresAt: number;
   }>();
-
-  /**
-   * Obtiene el documento de descubrimiento OIDC
-   * Equivalente a GET /.well-known/openid-configuration
-   */
   getDiscoveryDocument(): Observable<OidcDiscoveryDoc> {
     return of({
       issuer: this.ISSUER,
@@ -114,12 +98,7 @@ export class MockOidcProviderService {
     }).pipe(delay(100)); // Simular latencia de red
   }
 
-  /**
-   * Autentica al usuario y genera un código de autorización
-   * Simula el login form del IdP
-   */
   authenticateUser(username: string, password: string, scope: string, nonce?: string): Observable<string> {
-    // Simular latencia de red
     return of(null).pipe(
       delay(500),
       switchMap(() => {
@@ -131,9 +110,8 @@ export class MockOidcProviderService {
           return throwError(() => new Error('Invalid credentials'));
         }
 
-        // Generar código de autorización
         const code = this.generateRandomString(32);
-        const expiresAt = Date.now() + (10 * 60 * 1000); // Expira en 10 minutos
+        const expiresAt = Date.now() + (10 * 60 * 1000);
 
         this.authorizationCodes.set(code, {
           user: mockUser.userData,
@@ -147,10 +125,6 @@ export class MockOidcProviderService {
     );
   }
 
-  /**
-   * Intercambia el authorization code por tokens
-   * Simula el token endpoint: POST /token
-   */
   exchangeCodeForTokens(code: string, clientId: string): Observable<OidcTokenResponse> {
     return of(null).pipe(
       delay(300),
@@ -170,10 +144,8 @@ export class MockOidcProviderService {
           return throwError(() => new Error('Invalid client_id'));
         }
 
-        // Eliminar el código (one-time use)
         this.authorizationCodes.delete(code);
 
-        // Generar tokens
         const accessToken = this.generateAccessToken(authData.user, authData.scope);
         const idToken = this.generateIdToken(authData.user, clientId, authData.nonce);
         const refreshToken = this.generateRefreshToken(authData.user);
@@ -183,17 +155,13 @@ export class MockOidcProviderService {
           id_token: idToken,
           refresh_token: refreshToken,
           token_type: 'Bearer',
-          expires_in: 3600, // 1 hora
+          expires_in: 3600,
           scope: authData.scope
         });
       })
     );
   }
 
-  /**
-   * Renueva los tokens usando el refresh token
-   * Simula el token endpoint con grant_type=refresh_token
-   */
   refreshAccessToken(refreshToken: string): Observable<OidcTokenResponse> {
     return of(null).pipe(
       delay(300),
@@ -209,12 +177,10 @@ export class MockOidcProviderService {
           return throwError(() => new Error('Refresh token expired'));
         }
 
-        // Generar nuevos tokens
         const accessToken = this.generateAccessToken(tokenData.user, 'openid profile email roles');
         const idToken = this.generateIdToken(tokenData.user, this.CLIENT_ID);
         const newRefreshToken = this.generateRefreshToken(tokenData.user);
 
-        // Eliminar el refresh token viejo
         this.refreshTokens.delete(refreshToken);
 
         return of({
@@ -229,10 +195,6 @@ export class MockOidcProviderService {
     );
   }
 
-  /**
-   * Obtiene información del usuario desde el access token
-   * Simula el userinfo endpoint: GET /userinfo
-   */
   getUserInfo(accessToken: string): Observable<UserClaims> {
     return of(null).pipe(
       delay(200),
@@ -263,26 +225,12 @@ export class MockOidcProviderService {
     );
   }
 
-  /**
-   * Cierra la sesión del usuario
-   * Simula el end_session endpoint
-   */
   endSession(idToken: string): Observable<void> {
     return of(null).pipe(
       delay(200),
-      switchMap(() => {
-        // En un IdP real, aquí se invalidarían las sesiones
-        // Por ahora solo simulamos el delay
-        return of(void 0);
-      })
+      switchMap(() => of(void 0))
     );
   }
-
-  // ==================== MÉTODOS PRIVADOS ====================
-
-  /**
-   * Genera un JWT simulado para el access token
-   */
   private generateAccessToken(user: User, scope: string): string {
     const header = { alg: 'RS256', typ: 'JWT', kid: 'key-1' };
     const now = Math.floor(Date.now() / 1000);
@@ -301,9 +249,6 @@ export class MockOidcProviderService {
     return this.createMockJWT(header, payload);
   }
 
-  /**
-   * Genera un JWT simulado para el id token
-   */
   private generateIdToken(user: User, clientId: string, nonce?: string): string {
     const header = { alg: 'RS256', typ: 'JWT', kid: 'key-1' };
     const now = Math.floor(Date.now() / 1000);
@@ -332,12 +277,9 @@ export class MockOidcProviderService {
     return this.createMockJWT(header, payload);
   }
 
-  /**
-   * Genera un refresh token
-   */
   private generateRefreshToken(user: User): string {
     const token = this.generateRandomString(64);
-    const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 días
+    const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000);
 
     this.refreshTokens.set(token, {
       user,
@@ -347,9 +289,6 @@ export class MockOidcProviderService {
     return token;
   }
 
-  /**
-   * Crea un JWT mock (NO ES SEGURO - solo para desarrollo)
-   */
   private createMockJWT(header: any, payload: any): string {
     const headerStr = JSON.stringify(header);
     const payloadStr = JSON.stringify(payload);
@@ -361,9 +300,6 @@ export class MockOidcProviderService {
     return `${encodedHeader}.${encodedPayload}.${signature}`;
   }
 
-  /**
-   * Decodifica un JWT simulado
-   */
   private decodeAccessToken(token: string): any {
     try {
       const parts = token.split('.');
@@ -372,72 +308,51 @@ export class MockOidcProviderService {
         return null;
       }
 
-      const decodedPayloadStr = this.base64UrlDecode(parts[1]);
-      const payload = JSON.parse(decodedPayloadStr);
+      const payload = JSON.parse(this.base64UrlDecode(parts[1]));
+      const now = Math.floor(Date.now() / 1000);
 
-      // Verificar expiración
-      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-        return null;
-      }
-
-      return payload;
+      return (payload.exp && payload.exp < now) ? null : payload;
     } catch (error) {
-      console.error('❌ Error decodificando token:', error);
       return null;
     }
   }
 
-  /**
-   * Decodifica un ID token JWT
-   */
   decodeIdToken(token: string): any {
     return this.decodeAccessToken(token);
   }
 
-  /**
-   * Base64 URL encode
-   * Usa encodeURIComponent para manejar caracteres Unicode antes de btoa()
-   */
   private base64UrlEncode(str: string): string {
-    // Convertir a UTF-8 bytes y luego a base64
-    // btoa() solo acepta caracteres Latin1, así que usamos este workaround
-    const utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => {
-      return String.fromCharCode(parseInt(p1, 16));
-    });
+    const encoder = new TextEncoder();
+    const utf8Bytes = encoder.encode(str);
 
-    return btoa(utf8Bytes)
+    let binaryString = '';
+    for (let i = 0; i < utf8Bytes.length; i++) {
+      binaryString += String.fromCharCode(utf8Bytes[i]);
+    }
+
+    return btoa(binaryString)
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
   }
 
-  /**
-   * Base64 URL decode
-   * Decodifica el formato base64url y maneja caracteres UTF-8
-   */
   private base64UrlDecode(str: string): string {
-    // Convertir base64url a base64 estándar
     let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
 
-    // Agregar padding si es necesario
     while (base64.length % 4) {
       base64 += '=';
     }
 
-    // Decodificar de base64
-    const decoded = atob(base64);
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
 
-    // Convertir de bytes UTF-8 de vuelta a string
-    const utf8String = Array.from(decoded)
-      .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
-      .join('');
-
-    return decodeURIComponent(utf8String);
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
   }
 
-  /**
-   * Genera un string aleatorio seguro
-   */
   private generateRandomString(length: number): string {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     let result = '';
@@ -451,9 +366,6 @@ export class MockOidcProviderService {
     return result;
   }
 
-  /**
-   * Obtiene la lista de usuarios mock (solo para testing/demo)
-   */
   getMockUsers() {
     return this.mockUsers.map(u => ({
       username: u.username,
@@ -462,6 +374,3 @@ export class MockOidcProviderService {
     }));
   }
 }
-
-// Importar switchMap
-import { switchMap } from 'rxjs/operators';
