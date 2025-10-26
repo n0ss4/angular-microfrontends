@@ -14,17 +14,17 @@ Micro-frontend architecture combining **Native Federation** and **Module Federat
 
 ## Quick Start
 
-### Using Scripts (Recommended)
+### Development Mode (Using Scripts - Recommended)
 
 ```bash
-# Start all applications
-./start.sh
+# Start all applications in development mode
+./scripts/dev/start.sh
 
 # Stop all applications
-./stop.sh
+./scripts/dev/stop.sh
 
 # Restart all applications
-./restart.sh
+./scripts/dev/restart.sh
 ```
 
 **Access URLs:**
@@ -54,10 +54,86 @@ cd mfe3-app && npm start    # http://localhost:4203
 cd mfe4-app && npm start    # http://localhost:4204
 ```
 
-## Build
+## Production Deployment
+
+### Complete Deployment (Automated)
+
+Deploy everything in one command:
 
 ```bash
-cd host-app && npm run build && cd ../mfe1-app && npm run build && cd ../mfe2-app && npm run build && cd ../mfe3-app && npm run build && cd ../mfe4-app && npm run build
+# Build apps + Build Docker images + Start containers
+./scripts/prod/deploy.sh
+```
+
+This script runs all steps sequentially and stops if any step fails.
+
+### Step-by-Step Deployment
+
+#### 1. Build Applications
+
+```bash
+# Build all apps for production
+./scripts/prod/build-all.sh
+```
+
+#### 2. Build Docker Images
+
+```bash
+# Build Docker images (will run build-all.sh if needed)
+./scripts/prod/docker-build.sh
+```
+
+#### 3. Manage Containers
+
+```bash
+# Start containers
+./scripts/prod/docker-up.sh
+
+# Stop containers
+./scripts/prod/docker-down.sh
+
+# Restart containers
+./scripts/prod/docker-restart.sh
+```
+
+**Access URLs (Production via Gateway):**
+- Gateway: http://localhost (port 80)
+- Host: http://localhost/
+- MFE1: http://localhost/mfe1/
+- MFE2: http://localhost/mfe2/
+- MFE3: http://localhost/mfe3/
+- MFE4: http://localhost/mfe4/
+
+All applications are served through a single nginx reverse proxy gateway on port 80.
+
+### Manual Docker Commands
+
+```bash
+# Build and start all containers
+docker-compose up -d
+
+# Stop all containers
+docker-compose down
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f host-app
+```
+
+### Build Individual Docker Images
+
+```bash
+# Build specific app image
+cd host-app
+docker build -t angular-mf/host-app:latest --build-arg APP_NAME=host-app .
+
+# Run specific container
+docker run -d -p 4200:8080 --name host-app angular-mf/host-app:latest
 ```
 
 ## Recreate from Scratch

@@ -1,11 +1,14 @@
 #!/bin/bash
 
+# Navigate to project root
+cd "$(dirname "$0")/../.." || exit
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Starting all micro-frontends...${NC}"
+echo -e "${BLUE}Starting all micro-frontends in development mode...${NC}"
 
 # Array of apps with their ports
 apps=(
@@ -41,4 +44,4 @@ echo "  - MFE2:  http://localhost:4202"
 echo "  - MFE3:  http://localhost:4203"
 echo "  - MFE4:  http://localhost:4204"
 echo ""
-echo "Use ./stop.sh to stop all applications"
+echo "Use scripts/dev/stop.sh to stop all applications"

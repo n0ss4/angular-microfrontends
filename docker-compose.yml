@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Nginx Gateway (Reverse Proxy)
+  gateway:
+    build:
+      context: ./nginx-gateway
+      dockerfile: Dockerfile
+    image: angular-mf/gateway:latest
+    container_name: gateway
+    ports:
+      - "80:8080"
+    networks:
+      - microfrontend-network
+    depends_on:
+      - host-app
+      - mfe1-app
+      - mfe2-app
+      - mfe3-app
+      - mfe4-app
+    restart: unless-stopped
+
+  host-app:
+    build:
+      context: ./host-app
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: host-app
+    image: angular-mf/host-app:latest
+    container_name: host-app
+    expose:
+      - "8080"
+    networks:
+      - microfrontend-network
+    restart: unless-stopped
+
+  mfe1-app:
+    build:
+      context: ./mfe1-app
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: mfe1-app
+    image: angular-mf/mfe1-app:latest
+    container_name: mfe1-app
+    expose:
+      - "8080"
+    networks:
+      - microfrontend-network
+    restart: unless-stopped
+
+  mfe2-app:
+    build:
+      context: ./mfe2-app
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: mfe2-app
+    image: angular-mf/mfe2-app:latest
+    container_name: mfe2-app
+    expose:
+      - "8080"
+    networks:
+      - microfrontend-network
+    restart: unless-stopped
+
+  mfe3-app:
+    build:
+      context: ./mfe3-app
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: mfe3-app
+    image: angular-mf/mfe3-app:latest
+    container_name: mfe3-app
+    expose:
+      - "8080"
+    networks:
+      - microfrontend-network
+    restart: unless-stopped
+
+  mfe4-app:
+    build:
+      context: ./mfe4-app
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: mfe4-app
+    image: angular-mf/mfe4-app:latest
+    container_name: mfe4-app
+    expose:
+      - "8080"
+    networks:
+      - microfrontend-network
+    restart: unless-stopped
+
+networks:
+  microfrontend-network:
+    driver: bridge

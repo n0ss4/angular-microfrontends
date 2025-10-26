@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# Navigate to project root
+cd "$(dirname "$0")/../.." || exit
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Stopping all micro-frontends...${NC}"
+echo -e "${BLUE}Stopping all micro-frontends in development mode...${NC}"
 
 # Array of apps
 apps=(
