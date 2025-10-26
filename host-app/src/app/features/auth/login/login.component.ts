@@ -232,12 +232,16 @@ export class LoginComponent {
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
         console.log('✅ Login exitoso, redirigiendo...');
+        this.isLoading.set(false);
 
-        // Obtener la URL de retorno o ir a home
-        const returnUrl = sessionStorage.getItem('auth_return_url') || '/';
-        sessionStorage.removeItem('auth_return_url');
+        // Pequeño delay para asegurar que los signals se actualicen
+        setTimeout(() => {
+          // Obtener la URL de retorno o ir a home
+          const returnUrl = sessionStorage.getItem('auth_return_url') || '/mfe1';
+          sessionStorage.removeItem('auth_return_url');
 
-        this.router.navigateByUrl(returnUrl);
+          this.router.navigateByUrl(returnUrl);
+        }, 100);
       },
       error: (error) => {
         console.error('❌ Error en login:', error);
@@ -246,9 +250,6 @@ export class LoginComponent {
             ? 'Credenciales inválidas. Por favor, verifica tu usuario y contraseña.'
             : 'Ocurrió un error al iniciar sesión. Intenta nuevamente.'
         );
-        this.isLoading.set(false);
-      },
-      complete: () => {
         this.isLoading.set(false);
       }
     });

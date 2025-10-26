@@ -351,8 +351,11 @@ export class MockOidcProviderService {
    * Crea un JWT mock (NO ES SEGURO - solo para desarrollo)
    */
   private createMockJWT(header: any, payload: any): string {
-    const encodedHeader = this.base64UrlEncode(JSON.stringify(header));
-    const encodedPayload = this.base64UrlEncode(JSON.stringify(payload));
+    const headerStr = JSON.stringify(header);
+    const payloadStr = JSON.stringify(payload);
+
+    const encodedHeader = this.base64UrlEncode(headerStr);
+    const encodedPayload = this.base64UrlEncode(payloadStr);
     const signature = this.generateRandomString(43);
 
     return `${encodedHeader}.${encodedPayload}.${signature}`;
@@ -364,9 +367,13 @@ export class MockOidcProviderService {
   private decodeAccessToken(token: string): any {
     try {
       const parts = token.split('.');
-      if (parts.length !== 3) return null;
 
-      const payload = JSON.parse(this.base64UrlDecode(parts[1]));
+      if (parts.length !== 3) {
+        return null;
+      }
+
+      const decodedPayloadStr = this.base64UrlDecode(parts[1]);
+      const payload = JSON.parse(decodedPayloadStr);
 
       // Verificar expiración
       if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
@@ -374,7 +381,8 @@ export class MockOidcProviderService {
       }
 
       return payload;
-    } catch {
+    } catch (error) {
+      console.error('❌ Error decodificando token:', error);
       return null;
     }
   }
@@ -388,9 +396,16 @@ export class MockOidcProviderService {
 
   /**
    * Base64 URL encode
+   * Usa encodeURIComponent para manejar caracteres Unicode antes de btoa()
    */
   private base64UrlEncode(str: string): string {
-    return btoa(str)
+    // Convertir a UTF-8 bytes y luego a base64
+    // btoa() solo acepta caracteres Latin1, así que usamos este workaround
+    const utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => {
+      return String.fromCharCode(parseInt(p1, 16));
+    });
+
+    return btoa(utf8Bytes)
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
@@ -398,13 +413,26 @@ export class MockOidcProviderService {
 
   /**
    * Base64 URL decode
+   * Decodifica el formato base64url y maneja caracteres UTF-8
    */
   private base64UrlDecode(str: string): string {
-    str = str.replace(/-/g, '+').replace(/_/g, '/');
-    while (str.length % 4) {
-      str += '=';
+    // Convertir base64url a base64 estándar
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+
+    // Agregar padding si es necesario
+    while (base64.length % 4) {
+      base64 += '=';
     }
-    return atob(str);
+
+    // Decodificar de base64
+    const decoded = atob(base64);
+
+    // Convertir de bytes UTF-8 de vuelta a string
+    const utf8String = Array.from(decoded)
+      .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+      .join('');
+
+    return decodeURIComponent(utf8String);
   }
 
   /**

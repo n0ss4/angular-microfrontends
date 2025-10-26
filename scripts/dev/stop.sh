@@ -56,12 +56,42 @@ echo ""
 echo -e "${BLUE}Cleaning up any remaining processes on ports 4200-4204...${NC}"
 
 for port in {4200..4204}; do
-  pid=$(lsof -ti:$port 2>/dev/null)
-  if [ ! -z "$pid" ]; then
-    echo -e "${GREEN}Killing process on port $port (PID: $pid)${NC}"
-    kill -9 "$pid" 2>/dev/null
+  pids=$(lsof -ti:$port 2>/dev/null)
+  if [ ! -z "$pids" ]; then
+    echo -e "${GREEN}Killing process(es) on port $port (PIDs: $pids)${NC}"
+    echo "$pids" | xargs kill -9 2>/dev/null
   fi
 done
+
+# Wait a moment and verify ports are free
+sleep 1
+
+# Verify and force kill if ports are still occupied
+echo ""
+echo -e "${BLUE}Verifying ports are free...${NC}"
+still_occupied=false
+
+for port in {4200..4204}; do
+  pids=$(lsof -ti:$port 2>/dev/null)
+  if [ ! -z "$pids" ]; then
+    echo -e "${RED}Port $port still occupied (PIDs: $pids). Force killing...${NC}"
+    echo "$pids" | xargs kill -9 2>/dev/null
+    still_occupied=true
+
+    # Double check after force kill
+    sleep 0.5
+    remaining=$(lsof -ti:$port 2>/dev/null)
+    if [ ! -z "$remaining" ]; then
+      echo -e "${RED}⚠ Warning: Port $port still has process $remaining running${NC}"
+    else
+      echo -e "${GREEN}✓ Port $port is now free${NC}"
+    fi
+  fi
+done
+
+if [ "$still_occupied" = false ]; then
+  echo -e "${GREEN}✓ All ports are free${NC}"
+fi
 
 echo ""
 echo -e "${GREEN}All applications stopped!${NC}"

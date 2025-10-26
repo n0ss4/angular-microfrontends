@@ -1,17 +1,31 @@
-<div class="mfe4-container">
-  <h1>MFE4 - Web Component</h1>
-  <p>This is a micro-frontend loaded as a Web Component using Angular Elements.</p>
-  <p>Title: <strong>{{ title }}</strong></p>
-
-  <div class="mfe4-content">
-    <h2>Features</h2>
-    <ul>
-      <li>Angular 16</li>
-      <li>Module Federation</li>
-      <li>Angular Elements (Web Component)</li>
-      <li>Shared platform for multiple Angular versions</li>
-    </ul>
+<div class="mfe-container">
+  <div class="mfe-header">
+    <h1>MFE4 - Admin Panel</h1>
+    <p>Microfrontend 4 como Web Component (Angular Elements)</p>
   </div>
 
-  <router-outlet></router-outlet>
+  <div class="mfe-content">
+    <div class="card">
+      <h3>Panel de Administración</h3>
+      <p>Este microfrontend está construido como <strong>Web Component</strong> usando Angular Elements.</p>
+    </div>
+
+    <div class="card">
+      <h3>Características</h3>
+      <ul>
+        <li>Angular Elements (Web Component)</li>
+        <li>Module Federation + Webpack</li>
+        <li>Puerto: 4204</li>
+        <li>Encapsulado como custom element</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Estado</h3>
+      <div class="status">
+        <span class="status-dot"></span>
+        <span>Funcionando</span>
+      </div>
+    </div>
+  </div>
 </div>

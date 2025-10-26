@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError, of, timer } from 'rxjs';
-import { tap, catchError, switchMap, filter, take } from 'rxjs/operators';
+import { tap, catchError, switchMap, filter, take, map } from 'rxjs/operators';
 import { MockOidcProviderService } from './mock-oidc-provider.service';
 import {
   User,
@@ -207,15 +207,19 @@ export class AuthService {
           email_verified: userClaims.email_verified
         };
 
-        // Actualizar estado
-        this.updateSessionState({
+        // Actualizar estado sincrónicamente
+        const newState = {
           isAuthenticated: true,
           user,
           accessToken: tokens.access_token,
           idToken: tokens.id_token,
           expiresAt: tokens.expires_at,
           scopes: tokens.scope.split(' ')
-        });
+        };
+
+        this.sessionStateSubject.next(newState);
+        this.isAuthenticatedSignal.set(true);
+        this.currentUserSignal.set(user);
 
         // Programar renovación de token
         this.scheduleTokenRefresh(tokens.expires_at);
@@ -477,6 +481,3 @@ export class AuthService {
     return result;
   }
 }
-
-// Importar map operator
-import { map } from 'rxjs/operators';

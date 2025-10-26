@@ -63,7 +63,7 @@ export const guestGuard: CanActivateFn = (
   console.warn('⛔ [GuestGuard] Usuario ya autenticado, redirigiendo a home');
 
   // Usuario ya autenticado, redireccionar a home
-  router.navigate(['/']);
+  router.navigate(['/mfe1']);
 
   return false;
 };
