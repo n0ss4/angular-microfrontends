@@ -14,6 +14,30 @@ Micro-frontend architecture combining **Native Federation** and **Module Federat
 
 ## Quick Start
 
+### Using Scripts (Recommended)
+
+```bash
+# Start all applications
+./start.sh
+
+# Stop all applications
+./stop.sh
+
+# Restart all applications
+./restart.sh
+```
+
+**Access URLs:**
+- Host: http://localhost:4200
+- MFE1: http://localhost:4201
+- MFE2: http://localhost:4202
+- MFE3: http://localhost:4203
+- MFE4: http://localhost:4204
+
+Logs are saved in `./logs/` directory.
+
+### Manual Start
+
 ```bash
 # Install all apps
 cd host-app && npm install

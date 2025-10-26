@@ -1,0 +1,21 @@
+# Script runtime files
+.pids/
+logs/
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+.angular/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
