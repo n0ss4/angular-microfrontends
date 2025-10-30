@@ -118,4 +118,6 @@ docker-compose up -d --build
 
 For detailed commands and extended documentation, check the scripts in `./scripts/dev` and `./scripts/prod`.
 
-License: Check repository.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
