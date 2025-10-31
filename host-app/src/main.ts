@@ -6,8 +6,16 @@ import { environment } from './environments/environment';
 initFederation('/assets/federation.manifest.json')
   .catch(err => console.error(err))
   .then(_ => {
-    const shared = getShared();
+    const shared = getShared({ singleton: true, requiredVersionPrefix: '^' });
 
+    // FIXME: Using deprecated init() instead of createInstance() because we have a mixed setup:
+    // - Host uses Native Federation + Module Federation Enhanced (runtime only)
+    // - MFE1/2/4 use Webpack Module Federation (classic with remoteEntry.js)
+    // - MFE3 uses Native Federation
+    // The init() function has special logic to handle this heterogeneous architecture.
+    // To migrate to createInstance(), all remotes must be migrated to the same Module Federation
+    // implementation (either all Native Federation or all Module Federation Enhanced with build plugin).
+    // See: https://module-federation.io/guide/basic/runtime/runtime-api#how-to-migrate
     initModuleFederation({
       name: 'shell',
       remotes: [

@@ -114,6 +114,25 @@ docker-compose up -d --build
 2. Add small changes and tests if applicable.
 3. Open a PR with description and testing steps.
 
+## Acknowledgments
+
+This project was inspired by and built upon excellent resources from the Angular community:
+
+### Articles by Manfred Steyer (Angular Architects)
+
+- **[Micro Frontends with Modern Angular - Part 1: Standalone and esbuild](https://www.angulararchitects.io/blog/micro-frontends-with-modern-angular-part-1-standalone-and-esbuild/)**  
+  Foundation for understanding modern Angular microfrontends with Native Federation and esbuild.
+
+- **[Micro Frontends with Modern Angular - Part 2: Multi-Version and Multi-Framework Solutions with Angular Elements and Web Components](https://www.angulararchitects.io/blog/micro-frontends-with-modern-angular-part-2-multi-version-and-multi-framework-solutions-with-angular-elements-and-web-components/)**  
+  Deep dive into Web Components integration and multi-version scenarios.
+
+### Example Repository
+
+- **[mf-nf-poc by Manfred Steyer](https://github.com/manfredsteyer/mf-nf-poc)**  
+  Proof of concept demonstrating the combination of Native Federation and Module Federation in a single architecture.
+
+Special thanks to Manfred Steyer and the Angular Architects team for their pioneering work in the Module Federation and microfrontends space.
+
 ---
 
 For detailed commands and extended documentation, check the scripts in `./scripts/dev` and `./scripts/prod`.

@@ -1,3 +1,6 @@
+// Source: Adapted from https://github.com/manfredsteyer/mf-nf-poc
+// Original implementation by Manfred Steyer (Angular Architects)
+
 import { Type } from '@angular/core';
 
 type NativeFederationContainer = {

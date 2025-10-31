@@ -1,3 +1,6 @@
+// Source: Adapted from https://github.com/manfredsteyer/mf-nf-poc
+// Original implementation by Manfred Steyer (Angular Architects)
+
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, inject } from '@angular/core';
 import { loadRemote as loadModuleRemote } from '@module-federation/enhanced/runtime';
